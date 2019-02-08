@@ -19,7 +19,7 @@
 // TODO: add your function prototypes here as necessary
 static void handleCommand(char **args, int bg);
 void parseAndExecute(char *cmdline, char **args);
-
+void runExternalCommand(char **args, int bg);
 
 void child_reaper(__attribute__ ((unused)) int sig_num) {
 	while (waitpid(-1, NULL, WNOHANG) > 0);
@@ -78,4 +78,19 @@ void handleCommand(char **args, int bg){
 		print_history();
 	}
 
+}
+
+void runExternalCommand(char **args, int bg){
+	int cpid = fork();
+	if (cpid == -1) { // ford failed, handling the error
+		perror("fork");
+		exit(1);
+	}
+	else if (cpid == 0) { // child process
+		
+	}
+	else { // parent process
+		pid = waitpid(cpid, &status, 0);
+	}
+	
 }
