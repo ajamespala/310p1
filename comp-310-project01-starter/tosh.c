@@ -1,8 +1,10 @@
 /*
  * The Torero Shell (TOSH)
  *
- * Add your top-level comments here.
- */
+ *Authors: 
+	James Pala (ajamespala@sandiego.edu)
+	Conor Shea (cshea@sandiego.edu)
+*/
 
 #include <stdlib.h>
 #include <string.h>
