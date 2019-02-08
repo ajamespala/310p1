@@ -67,3 +67,15 @@ int main(){
 
 	return 0;
 }
+
+void handleCommand(char **args, int bg){
+	// handle the built in commands directly
+	if (strcmp(args[0], "exit") == 0) {
+		printf("Goodbye! Thank you for using the Torero Shell!\n");
+		exit(0);
+	}	
+	else if (strcmp(args[0], "history") == 0){
+		print_history();
+	}
+
+}
