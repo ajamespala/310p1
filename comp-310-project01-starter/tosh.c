@@ -62,7 +62,24 @@ int main(){
 
 		// TODO: complete the following top-level steps
 		// (2) parse the cmdline
-
+	//need: cmd (just the command and arguements), arg_list (with [0] just the command, no arguements)
+		char *path = getenv("PATH");
+		const char s[1] = ":";
+		char *token = strtok(path, s);
+		int access_flag = -1;
+		while( token != NULL):
+			//concatinate token and cmd here
+			access_flag = access(cmd_path, XOK);
+			if(access_flag == 0) { 
+				break;
+			}
+			token = strtok(path, s);
+		}
+		if( access_flag == -1) {
+			//command doesn't exist
+			if(!
+			continue;
+		}
 		// (3) determine how to execute it, and then execute it
 
 	}
