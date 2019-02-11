@@ -61,13 +61,19 @@ int main(){
 		// TODO: complete the following top-level steps
 		// (2) parse the cmdline
 	//need: cmd (just the command and arguements), arg_list (with [0] just the command, no arguements)
+		int arg_i = 0;
+		char arg_list[MAXARGS][MAXLINE];
+		for(int i = 0; i < (int)strlen(cmdline); i++) {
+			if(strcmp(cmdline[i]," ")
+		}		
+
 		char *path = getenv("PATH");
-		const char s[1] = ":";
+		const char s[2] = ":";
 		char *token = strtok(path, s);
 		int access_flag = -1;
 		while( token != NULL):
 			//concatinate token and cmd here
-			access_flag = access(cmd_path, XOK);
+			access_flag = access(cmd_path, X_OK);
 			if(access_flag == 0) { 
 				break;
 			}
