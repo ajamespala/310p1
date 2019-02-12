@@ -1,10 +1,8 @@
 /*
  * The Torero Shell (TOSH)
  *
- *Authors: 
-	James Pala (ajamespala@sandiego.edu)
-	Conor Shea (cshea@sandiego.edu)
-*/
+ * Add your top-level comments here.
+ */
 
 #include <stdlib.h>
 #include <string.h>
@@ -62,30 +60,29 @@ int main(){
 
 		// TODO: complete the following top-level steps
 		// (2) parse the cmdline
-	//need: cmd (just the command and arguements), arg_list (with [0] just the command, no arguements)
-		int arg_i = 0;
-		char arg_list[MAXARGS][MAXLINE];
-		for(int i = 0; i < (int)strlen(cmdline); i++) {
-			if(strcmp(cmdline[i]," ")
-		}		
-
+		char *argv[MAXARGS];
+		int bg = parseArguments(cmdline, argv);
+		if(argv[0] == NULL) {
+			continue;
+		}
 		char *path = getenv("PATH");
-		const char s[2] = ":";
-		char *token = strtok(path, s);
+		char *token = strtok(path, ":");
+		char *cmd_path = strcat(token, arg_list[0])
 		int access_flag = -1;
-		while( token != NULL):
+		while(token != NULL):
 			//concatinate token and cmd here
 			access_flag = access(cmd_path, X_OK);
 			if(access_flag == 0) { 
 				break;
 			}
-			token = strtok(path, s);
+			token = strtok(NULL, s);
 		}
-		if( access_flag == -1) {
+		if(access_flag == -1) {
 			//command doesn't exist
-			if(!
+			printf("%s does not exist", argv[0]);
 			continue;
 		}
+		strcpy(arg_list[0], cmd_path);
 		// (3) determine how to execute it, and then execute it
 
 	}
@@ -99,46 +96,8 @@ void handleCommand(char **args, int bg){
 		printf("Goodbye! Thank you for using the Torero Shell!\n");
 		exit(0);
 	}	
-
-	else if (strcmp(args[0], "cd") == 0){
-		// 1 - get the value of its current working directory
-		// call getcwd on startup
-		// 2 - when user enters the cd command, change the current directory
-		//  by calling chdir
-		// 3 - subsequent calls to pwd should reflect the change in the cwd 
-	
-		char cwd[256];
-		if (getcwd(cwd, sizeof(cwd)) == NULL) {
-			perror("getcwd() error");
-		}
-		else {
-			fprintf("curremnt working directory is: %s\n", cwd);
-		}
-
-		int ch_dir = chdir(args[1]);
-		if (ch_dir == -1){
-			fprintf(stderr, "ERROR: directory not found\n");
-		}	
-	}
-
 	else if (strcmp(args[0], "history") == 0){
 		print_history();
-	}
-	
-	else if (args[0][0] == '!'){
-		unsigned in cmd_num = strtoul(&args[0][1], NULL, 10);
-		char *cmd = get_command(cmd_num);
-		if (cmd == NULL){
-			fprintf(stderr, "ERROR: %d is not in history\n", cmd_num);
-		} 
-		else {
-			pareseAndExecute(cmd, args);
-		}
-		
-	}
-	else
-	{
-		runExternalCommand(args, bg);
 	}
 
 }
