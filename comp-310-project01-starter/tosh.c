@@ -144,16 +144,30 @@ void handleCommand(char **args, int bg){
 }
 
 void runExternalCommand(char **args, int bg){
-	int cpid = fork();
-	if (cpid == -1) { // ford failed, handling the error
+	pid_t cpid = fork();
+	if (cpid == 0) { // child prcoess
+		//execv(full_path_to_command_executable, command_argv_list);
+		// need to make sure that the full path is held in args[0]
+		
+		
+		// if execv fails, pritn out the error statement, otherwise we should not get here
+		fprintf(stderr, "ERROR: Command not found\n");
+		exit(63);
+	}
+	else if (cpid > 0) { // parent process and background process
+		if (bg){	
+			// check to see if the child has returned
+			// do not block if the child is still running
+			waitpid(cpid, NULL, WNOHANG);
+		}
+		else {
+			// wait here until the child finishes
+			waitpid(cpid, NULL, 0);
+		}
+	}
+	else { // fork failed
 		perror("fork");
 		exit(1);
-	}
-	else if (cpid == 0) { // child process
-		
-	}
-	else { // parent process
-		pid = waitpid(cpid, &status, 0);
 	}
 	
 }
