@@ -166,7 +166,7 @@ void runExternalCommand(char **args, int bg){
 		}
 	}
 	else { // fork failed
-		perror("fork");
+		perror("FORK:  n");//prints "FORK: " followed by an error message
 		exit(1);
 	}
 	
