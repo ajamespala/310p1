@@ -18,7 +18,7 @@
 
 // TODO: add your function prototypes here as necessary
 static void handleCommand(char **args, int bg);
-void parseAndExecute(char *cmdline, char **args);
+//void parseAndExecute(char *cmdline, char **args);
 void runExternalCommand(char **args, int bg);
 
 void child_reaper(__attribute__ ((unused)) int sig_num) {
@@ -26,8 +26,8 @@ void child_reaper(__attribute__ ((unused)) int sig_num) {
 }
 
 int main(){ 
-	char cmdline[MAXLINE];
-	char *argv[MAXARGS];
+	//char cmdline[MAXLINE];
+	//char *argv[MAXARGS];
 	 
 	//register a signal handler for SIGCHLD here
 	struct sigaction sa;
@@ -43,7 +43,7 @@ int main(){
 		fflush(stdout);
 
 		// (1) read in the next command entered by the user
-		cmdline = readline("tosh$ ");
+		char *cmdline = readline("tosh$ ");
 
 		if ((fgets(cmdline, MAXLINE, stdin) == NULL) && ferror(stdin)){
 			clearerr(stdin);
@@ -84,6 +84,14 @@ int main(){
 		}
 		strcpy(argv[0], cmd_path);
 		// (3) determine how to execute it, and then execute it
+		
+
+		if (argv[0] != NULL){
+			if (argv[0][0] != '!'){
+				add_to_history(cmdline);
+			}
+			handleCommand(argv, bg);
+		}		
 
 	}
 
@@ -109,7 +117,7 @@ void handleCommand(char **args, int bg){
                         perror("getcwd() error");
                 }
                 else {
-                        fprintf("curremnt working directory is: %s\n", cwd);
+                        printf("current working directory is: %s\n", cwd);
                 }
 
                 int ch_dir = chdir(args[1]);
@@ -123,14 +131,14 @@ void handleCommand(char **args, int bg){
         }
 
         else if (args[0][0] == '!'){
-                unsigned in cmd_num = strtoul(&args[0][1], NULL, 10);
+                unsigned int cmd_num = strtoul(&args[0][1], NULL, 10);
                 char *cmd = get_command(cmd_num);
                 if (cmd == NULL){
                         fprintf(stderr, "ERROR: %d is not in history\n", cmd_num);
                 }
-                else {
-                        pareseAndExecute(cmd, args);
-                }
+              //  else {
+              //          parseAndExecute(cmd, args);
+              //  }
 
         }
         else
