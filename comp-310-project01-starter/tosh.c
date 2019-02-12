@@ -91,14 +91,52 @@ int main(){
 }
 
 void handleCommand(char **args, int bg){
-	// handle the built in commands directly
-	if (strcmp(args[0], "exit") == 0) {
-		printf("Goodbye! Thank you for using the Torero Shell!\n");
-		exit(0);
-	}	
-	else if (strcmp(args[0], "history") == 0){
-		print_history();
-	}
+	 // handle the built in commands directly
+        if (strcmp(args[0], "exit") == 0) {
+                printf("Goodbye! Thank you for using the Torero Shell!\n");
+                exit(0);
+        }
+
+        else if (strcmp(args[0], "cd") == 0){
+                // 1 - get the value of its current working directory
+                // call getcwd on startup
+                // 2 - when user enters the cd command, change the current directory
+                //  by calling chdir
+                // 3 - subsequent calls to pwd should reflect the change in the cwd 
+
+                char cwd[256];
+                if (getcwd(cwd, sizeof(cwd)) == NULL) {
+                        perror("getcwd() error");
+                }
+                else {
+                        fprintf("curremnt working directory is: %s\n", cwd);
+                }
+
+                int ch_dir = chdir(args[1]);
+                if (ch_dir == -1){
+                        fprintf(stderr, "ERROR: directory not found\n");
+                }
+        }
+
+        else if (strcmp(args[0], "history") == 0){
+                print_history();
+        }
+
+        else if (args[0][0] == '!'){
+                unsigned in cmd_num = strtoul(&args[0][1], NULL, 10);
+                char *cmd = get_command(cmd_num);
+                if (cmd == NULL){
+                        fprintf(stderr, "ERROR: %d is not in history\n", cmd_num);
+                }
+                else {
+                        pareseAndExecute(cmd, args);
+                }
+
+        }
+        else
+        {
+                runExternalCommand(args, bg);
+        }
 
 }
 
