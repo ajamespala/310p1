@@ -33,7 +33,7 @@ int main(){
 	struct sigaction sa;
 	sa.sa_handler = child_reaper;
 	sa.sa_flags = 0;
-	sigaction(SIGCHILD, &sa, NULL);
+	sigaction(SIGCHLD, &sa, NULL);
 	
 
 	while(1) {
