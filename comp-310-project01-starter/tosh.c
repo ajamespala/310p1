@@ -33,7 +33,7 @@ int main(){
 	struct sigaction sa;
 	sa.sa_handler = child_reaper;
 	sa.sa_flags = 0;
-	sigaction(SIGCHILD, &sa, NULL);
+	sigaction(SIGCHLD, &sa, NULL);
 	
 
 	while(1) {
@@ -43,7 +43,7 @@ int main(){
 		fflush(stdout);
 
 		// (1) read in the next command entered by the user
-		char *cmdline = readline("tosh$ ");
+		cmdline = readline("tosh$ ");
 
 		if ((fgets(cmdline, MAXLINE, stdin) == NULL) && ferror(stdin)){
 			clearerr(stdin);
@@ -67,22 +67,22 @@ int main(){
 		}
 		char *path = getenv("PATH");
 		char *token = strtok(path, ":");
-		char *cmd_path = strcat(token, arg_list[0])
+		char *cmd_path = strcat(token, argv[0]);
 		int access_flag = -1;
-		while(token != NULL):
+		while(token != NULL) {
 			//concatinate token and cmd here
 			access_flag = access(cmd_path, X_OK);
 			if(access_flag == 0) { 
 				break;
 			}
-			token = strtok(NULL, s);
+			token = strtok(NULL, ":");
 		}
 		if(access_flag == -1) {
 			//command doesn't exist
 			printf("%s does not exist", argv[0]);
 			continue;
 		}
-		strcpy(arg_list[0], cmd_path);
+		strcpy(argv[0], cmd_path);
 		// (3) determine how to execute it, and then execute it
 
 	}
