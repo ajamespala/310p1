@@ -204,15 +204,16 @@ int handleCommand(char **args, int bg){
         }
         else
         {
-		return 0;
-		//runExternalCommand(args, bg);
-        }
+		runExternalCommand(args, bg);
+        	return 0;
+	}
 
 }
 
 void runExternalCommand(char **args, int bg){
 	pid_t cpid = fork();
 	if (cpid == 0) { // child prcoess
+		execv(args[0], args);
 		//execv(full_path_to_command_executable, command_argv_list);
 		// need to make sure that the full path is held in args[0]
 		
