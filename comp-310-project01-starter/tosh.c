@@ -46,15 +46,15 @@ int main(){
 
 		// (0) print the shell prompt
 		fprintf(stdout, "tosh> ");
-		fflush(stdout);
+		//fflush(stdout);
 
 		// (1) read in the next command entered by the user
 		char *cmdline = readline("tosh$ ");
-
-		if ((fgets(cmdline, MAXLINE, stdin) == NULL) && ferror(stdin)){
-			clearerr(stdin);
-			continue;
-		}
+		//printf("%s", cmdline);
+		//if ((fgets(cmdline, MAXLINE, stdin) == NULL) && ferror(stdin)){
+		//	clearerr(stdin);
+		//	continue;
+		//}
 		// NULL indicates EOF was reached, which in this case means someone
 		// probably typed in CTRL-d
 		if (cmdline == NULL) {
@@ -68,7 +68,7 @@ int main(){
 		// (2) parse the cmdline
 		char *argv[MAXARGS];
 		int bg = parseArguments(cmdline, argv);
-		if(argv[0] == NULL) {
+		if (argv[0] == NULL) {
 			continue;
 		}
 		char *path = getenv("PATH");
@@ -85,7 +85,7 @@ int main(){
 		}
 		if(access_flag == -1) {
 			//command doesn't exist
-			printf("%s does not exist", argv[0]);
+			printf("%s does not exist\n", argv[0]);
 			continue;
 		}
 		strcpy(argv[0], cmd_path);
