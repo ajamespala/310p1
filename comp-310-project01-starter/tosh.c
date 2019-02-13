@@ -20,6 +20,12 @@
 static void handleCommand(char **args, int bg);
 //void parseAndExecute(char *cmdline, char **args);
 void runExternalCommand(char **args, int bg);
+int parseArguments(char * const line, char **argv);
+void add_to_history(char * const cmd);
+void print_history();
+char* get_command(unsigned int cmd_num);
+
+
 
 void child_reaper(__attribute__ ((unused)) int sig_num) {
 	while (waitpid(-1, NULL, WNOHANG) > 0);

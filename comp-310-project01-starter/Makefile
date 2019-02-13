@@ -3,11 +3,11 @@ CFLAGS = -g -lreadline -Wall #-Werror
 TARGETS = tosh siesta
 
 # add to this list if you create new .c source files
-TOSH_SRC = tosh.c
+TOSH_SRC = tosh.c history_queue.c parse_args.c 
 
 all: $(TARGETS)
 
-ttsh: $(TOSH_SRC) 
+tosh: $(TOSH_SRC) 
 	$(CC) $(CFLAGS) -o $@ $(TOSH_SRC)
 
 siesta: siesta.c
