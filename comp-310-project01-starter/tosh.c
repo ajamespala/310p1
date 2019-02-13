@@ -173,7 +173,6 @@ int handleCommand(char **args, int bg){
                 }
                 else {
 			printf("command that should be executed: %s\n", cmd);
-                        handleCommand(cmd, bg);
                 }
 		return 1;
 
