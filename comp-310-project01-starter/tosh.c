@@ -17,7 +17,7 @@
 #include "history_queue.h"
 
 // TODO: add your function prototypes here as necessary
-static void handleCommand(char **args, int bg);
+static int handleCommand(char **args, int bg);
 //void parseAndExecute(char *cmdline, char **args);
 void runExternalCommand(char **args, int bg);
 int parseArguments(char * const line, char **argv);
@@ -47,7 +47,7 @@ int main(){
 
 		// (0) print the shell prompt
 		fprintf(stdout, "tosh> ");
-		//fflush(stdout);
+		fflush(stdout);
 
 		// (1) read in the next command entered by the user
 		char *cmdline = readline("tosh$ ");
@@ -72,21 +72,24 @@ int main(){
 		if (argv[0] == NULL) {
 			continue;
 		}
-		char *cmd_path = NULL;
-		int cmd_exists = parseCommandLine(argv, cmd_path);
 		// (3) determine how to execute it, and then execute it
+		if (argv[0] != NULL){
+			if (argv[0][0] != '!'){
+				add_to_history(cmdline);
+			}
+			if(handleCommand(argv, bg)){
+				continue;
+			}
+		}		
+		char cmd_path[MAXLINE];
+		int cmd_exists = parseCommandLine(argv, cmd_path);
 		
 		if(cmd_exists == -1) {
 			printf("%s does not exist\n", argv[0]);
 			continue;
 		}
-		if (argv[0] != NULL){
-			if (argv[0][0] != '!'){
-				add_to_history(cmdline);
-			}
-			handleCommand(argv, bg);
-		}		
 
+                runExternalCommand(argv, bg);
 	}
 
 	return 0;
@@ -96,37 +99,39 @@ int parseCommandLine(char **argv, char *cmd_path) {
 	char *path = getenv("PATH");
 	printf("%s\n", path);
 	char *token = strtok(path, ":");
+	strcpy(cmd_path, token);
 	char exec_name[MAXLINE] = "";
 	strcpy(exec_name, argv[0]);
-	strcat(token, "/");
-	strcat(token, exec_name);
+	strcat(cmd_path, "/");
+	strcat(cmd_path, exec_name);
 	int access_flag = -1;
 	while(token != NULL) {
 		//concatinate token and cmd here
-		printf("%s\n", token);
-		access_flag = access(token, X_OK);
+		printf("%s\n", cmd_path);
+		access_flag = access(cmd_path, X_OK);
 		if(access_flag == 0) { 
 			break;
 		}
 		token = strtok(NULL, ":");
-		printf("Next token: %s\n", token);
+		strcpy(cmd_path, token);
+		printf("Next token: %s\n", cmd_path);
 		strcat(cmd_path, "/");
-		cmd_path = strcat(token, exec_name);
+		strcat(cmd_path, exec_name);
 	}
 	if(access_flag == -1) {
 		//command doesn't exist
 		return -1;
 	}
-	strcpy(argv[0], token);
-	strcpy(cmd_path, token);
+	strcpy(argv[0], cmd_path);
 	return 1;
 }
 
-void handleCommand(char **args, int bg){
+int handleCommand(char **args, int bg){
 	 // handle the built in commands directly
         if (strcmp(args[0], "exit") == 0) {
                 printf("Goodbye! Thank you for using the Torero Shell!\n");
                 exit(0);
+		return 1;
         }
 
         else if (strcmp(args[0], "cd") == 0){
@@ -148,10 +153,12 @@ void handleCommand(char **args, int bg){
                 if (ch_dir == -1){
                         fprintf(stderr, "ERROR: directory not found\n");
                 }
+		return 1;
         }
 
         else if (strcmp(args[0], "history") == 0){
                 print_history();
+		return 1;
         }
 
         else if (args[0][0] == '!'){
@@ -163,11 +170,12 @@ void handleCommand(char **args, int bg){
               //  else {
               //          parseAndExecute(cmd, args);
               //  }
+		return 1;
 
         }
         else
         {
-                runExternalCommand(args, bg);
+		return -1;
         }
 
 }
