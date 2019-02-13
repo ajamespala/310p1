@@ -46,8 +46,8 @@ int main(){
 	while(1) {
 
 		// (0) print the shell prompt
-		fprintf(stdout, "tosh> ");
-		fflush(stdout);
+		//fprintf(stdout, "tosh> ");
+		//fflush(stdout);
 
 		// (1) read in the next command entered by the user
 		char *cmdline = readline("tosh$ ");
@@ -153,6 +153,10 @@ int handleCommand(char **args, int bg){
                 if (ch_dir == -1){
                         fprintf(stderr, "ERROR: directory not found\n");
                 }
+		else {
+			getcwd(cwd, sizeof(cwd));
+			printf("new directory is: %s\n", cwd);
+		}
 		return 1;
         }
 
@@ -167,15 +171,17 @@ int handleCommand(char **args, int bg){
                 if (cmd == NULL){
                         fprintf(stderr, "ERROR: %d is not in history\n", cmd_num);
                 }
-              //  else {
-              //          parseAndExecute(cmd, args);
-              //  }
+                else {
+			printf("command that should be executed: %s\n", cmd);
+                        handleCommand(cmd, bg);
+                }
 		return 1;
 
         }
         else
         {
 		return -1;
+		//runExternalCommand(args, bg);
         }
 
 }
