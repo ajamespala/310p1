@@ -37,7 +37,7 @@ void add_to_history(char * const cmd) {
 
 void print_history() {
 	for (int i = start_index, j = 0; j < list_size; j++, i = (i+1)%MAXHIST) {
-		printf("%d\t%s", history[i].cmd_num, history[i].cmdline);
+		printf("%d\t%s\n", history[i].cmd_num, history[i].cmdline);
 	}
 }
 
