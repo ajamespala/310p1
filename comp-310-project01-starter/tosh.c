@@ -94,22 +94,31 @@ int main(){
 
 int parseCommandLine(char **argv, char *cmd_path) {
 	char *path = getenv("PATH");
+	printf("%s\n", path);
 	char *token = strtok(path, ":");
-	cmd_path = strcat(token, argv[0]);
+	char exec_name[MAXLINE] = "";
+	strcpy(exec_name, argv[0]);
+	strcat(token, "/");
+	strcat(token, exec_name);
 	int access_flag = -1;
 	while(token != NULL) {
 		//concatinate token and cmd here
-		access_flag = access(cmd_path, X_OK);
+		printf("%s\n", token);
+		access_flag = access(token, X_OK);
 		if(access_flag == 0) { 
 			break;
 		}
 		token = strtok(NULL, ":");
+		printf("Next token: %s\n", token);
+		strcat(cmd_path, "/");
+		cmd_path = strcat(token, exec_name);
 	}
 	if(access_flag == -1) {
 		//command doesn't exist
 		return -1;
 	}
-	strcpy(argv[0], cmd_path);
+	strcpy(argv[0], token);
+	strcpy(cmd_path, token);
 	return 1;
 }
 
