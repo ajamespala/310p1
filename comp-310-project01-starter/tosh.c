@@ -173,6 +173,29 @@ int handleCommand(char **args, int bg){
                 }
                 else {
 			printf("command that should be executed: %s\n", cmd);
+			char *argv[MAXARGS];
+			int bg = parseArguments(cmd, argv);
+			if (argv[0] == NULL) {
+				return -1;
+			}
+			// (3) determine how to execute it, and then execute it
+			if (argv[0] != NULL){
+				if (argv[0][0] != '!'){
+					add_to_history(cmd);
+				}
+				if(handleCommand(argv, bg)){
+					return 1;
+				}
+			}		
+			char cmd_path[MAXLINE];
+			int cmd_exists = parseCommandLine(argv, cmd_path);
+			
+			if(cmd_exists == -1) {
+				printf("%s does not exist\n", argv[0]);
+				return -1;
+			}
+
+			runExternalCommand(argv, bg);
                 }
 		return 1;
 
