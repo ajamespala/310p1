@@ -24,6 +24,7 @@ int parseArguments(char * const line, char **argv);
 void add_to_history(char * const cmd);
 void print_history();
 char* get_command(unsigned int cmd_num);
+int parseCommandLine(char **arg, char *cmd_path);
 
 
 
@@ -71,27 +72,14 @@ int main(){
 		if (argv[0] == NULL) {
 			continue;
 		}
-		char *path = getenv("PATH");
-		char *token = strtok(path, ":");
-		char *cmd_path = strcat(token, argv[0]);
-		int access_flag = -1;
-		while(token != NULL) {
-			//concatinate token and cmd here
-			access_flag = access(cmd_path, X_OK);
-			if(access_flag == 0) { 
-				break;
-			}
-			token = strtok(NULL, ":");
-		}
-		if(access_flag == -1) {
-			//command doesn't exist
+		char *cmd_path = NULL;
+		int cmd_exists = parseCommandLine(argv, cmd_path);
+		// (3) determine how to execute it, and then execute it
+		
+		if(cmd_exists == -1) {
 			printf("%s does not exist\n", argv[0]);
 			continue;
 		}
-		strcpy(argv[0], cmd_path);
-		// (3) determine how to execute it, and then execute it
-		
-
 		if (argv[0] != NULL){
 			if (argv[0][0] != '!'){
 				add_to_history(cmdline);
@@ -102,6 +90,27 @@ int main(){
 	}
 
 	return 0;
+}
+
+int parseCommandLine(char **argv, char *cmd_path) {
+	char *path = getenv("PATH");
+	char *token = strtok(path, ":");
+	cmd_path = strcat(token, argv[0]);
+	int access_flag = -1;
+	while(token != NULL) {
+		//concatinate token and cmd here
+		access_flag = access(cmd_path, X_OK);
+		if(access_flag == 0) { 
+			break;
+		}
+		token = strtok(NULL, ":");
+	}
+	if(access_flag == -1) {
+		//command doesn't exist
+		return -1;
+	}
+	strcpy(argv[0], cmd_path);
+	return 1;
 }
 
 void handleCommand(char **args, int bg){
