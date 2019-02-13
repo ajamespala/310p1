@@ -47,8 +47,8 @@ int main(){
 
 		// (0) print the shell prompt
 		//fprintf(stdout, "tosh> ");
-		//fflush(stdout);
 
+		//fflush(stdout);
 		// (1) read in the next command entered by the user
 		char *cmdline = readline("tosh$ ");
 		//printf("%s", cmdline);
@@ -84,7 +84,7 @@ int main(){
 		char cmd_path[MAXLINE];
 		int cmd_exists = parseCommandLine(argv, cmd_path);
 		
-		if(cmd_exists == -1) {
+		if(cmd_exists == 0) {
 			printf("%s does not exist\n", argv[0]);
 			continue;
 		}
@@ -97,30 +97,32 @@ int main(){
 
 int parseCommandLine(char **argv, char *cmd_path) {
 	char *path = getenv("PATH");
-	printf("%s\n", path);
-	char *token = strtok(path, ":");
-	strcpy(cmd_path, token);
+	printf("Possible paths: %s\n", path);
 	char exec_name[MAXLINE] = "";
 	strcpy(exec_name, argv[0]);
-	strcat(cmd_path, "/");
-	strcat(cmd_path, exec_name);
+	
+	char *token = strtok(path, ":");
 	int access_flag = -1;
 	while(token != NULL) {
 		//concatinate token and cmd here
+		strcpy(cmd_path, token);
+		strcat(cmd_path, "/");
+		strcat(cmd_path, exec_name);
 		printf("%s\n", cmd_path);
 		access_flag = access(cmd_path, X_OK);
+		fflush(stdout);
 		if(access_flag == 0) { 
 			break;
 		}
 		token = strtok(NULL, ":");
-		strcpy(cmd_path, token);
+		printf("DEBUG: Checkpoint\n");
+		fflush(stdout);
 		printf("Next token: %s\n", cmd_path);
-		strcat(cmd_path, "/");
-		strcat(cmd_path, exec_name);
 	}
+	printf("DEBUG: access flag is -1\n");
 	if(access_flag == -1) {
 		//command doesn't exist
-		return -1;
+		return 0;
 	}
 	strcpy(argv[0], cmd_path);
 	return 1;
@@ -176,7 +178,7 @@ int handleCommand(char **args, int bg){
 			char *argv[MAXARGS];
 			int bg = parseArguments(cmd, argv);
 			if (argv[0] == NULL) {
-				return -1;
+				return 0;
 			}
 			// (3) determine how to execute it, and then execute it
 			if (argv[0] != NULL){
@@ -190,9 +192,9 @@ int handleCommand(char **args, int bg){
 			char cmd_path[MAXLINE];
 			int cmd_exists = parseCommandLine(argv, cmd_path);
 			
-			if(cmd_exists == -1) {
+			if(cmd_exists == 0) {
 				printf("%s does not exist\n", argv[0]);
-				return -1;
+				return 0;
 			}
 
 			runExternalCommand(argv, bg);
@@ -202,7 +204,7 @@ int handleCommand(char **args, int bg){
         }
         else
         {
-		return -1;
+		return 0;
 		//runExternalCommand(args, bg);
         }
 
