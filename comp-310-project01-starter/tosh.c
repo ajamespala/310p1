@@ -88,6 +88,7 @@ int main(){
 			printf("%s does not exist\n", argv[0]);
 			continue;
 		}
+		
 
                 runExternalCommand(argv, bg);
 	}
@@ -211,31 +212,100 @@ int handleCommand(char **args, int bg){
 }
 
 void runExternalCommand(char **args, int bg){
-	pid_t cpid = fork();
-	if (cpid == 0) { // child prcoess
-		execv(args[0], args);
-		//execv(full_path_to_command_executable, command_argv_list);
-		// need to make sure that the full path is held in args[0]
-		
-		
-		// if execv fails, pritn out the error statement, otherwise we should not get here
-		fprintf(stderr, "ERROR: Command not found\n");
-		exit(63);
-	}
-	else if (cpid > 0) { // parent process and background process
-		if (bg){	
-			// check to see if the child has returned
-			// do not block if the child is still running
-			waitpid(cpid, NULL, WNOHANG);
+	int i = 0;
+	int index = 0;
+	int pipe_cmd = 0;
+	while(args[i] != NULL){
+		if(strcmp(args[i], "|") == 0){
+			index = i;
+			pipe_cmd = 1;
 		}
-		else {
-			// wait here until the child finishes
-			waitpid(cpid, NULL, 0);
-		}
-	}
-	else { // fork failed
-		perror("FORK:  n");//prints "FORK: " followed by an error message
-		exit(1);
-	}
+		i++;
+	}	
 	
+
+	pid_t cpid1, cpid2;
+	if(pipe_cmd ==1){
+		
+		printf("in the pipe_cmd = 1\n");
+
+		int pipe_id[2];
+		if(pipe(pipe_id) != 0){
+			printf("Pipe failed\n");
+			return;
+		}
+
+		if (pipe(pipe_id)){
+			fprintf(stderr, "Pipe failed.\n");
+			exit(1);
+		}
+
+		cpid1 = fork();
+		if (cpid1 == 0) { // child prcoess
+			
+			close(pipe_id[0]);
+			dup2(pipe_id[1], STDOUT_FILENO);
+			close(pipe_id[1]);
+			
+			printf("COMAND PATH FOR EXECV: %s\n", args[0]);
+			execv(args[0], args);
+
+			fprintf(stderr, "ERROR: Command not found\n");
+			exit(63);
+		}
+		else { // parent process 
+			cpid2 = fork();
+			if(cpid2 == 0){		
+				close(pipe_id[1]);
+				dup2(pipe_id[0], STDIN_FILENO);
+				close(pipe_id[0]);
+				execv(args[0], args);
+				// prints if execv fails
+				fprintf(stderr, "ERROR: Command not found.\n");
+			} 
+			else {
+				//wait here until the children finish
+				printf("about to wait for the children to finish\n");
+				wait(NULL);
+			}
+			
+		}
+	}
+
+	else {
+		
+		cpid1 = fork();
+		if (cpid1 == 0){ // child process
+			char full_cmd[MAXLINE] = "";
+			strcat(full_cmd, args[0]);
+			printf("full_cmd: %s\n", full_cmd);	
+			execv(full_cmd, args);
+
+			//prints if execv fails
+			fprintf(stderr, "ERROR: Commnand not found.\n");
+			exit(63);
+		}
+		else if (cpid1 > 0){// parent process and background process
+
+			if (bg){	
+				// check to see if the child has returned
+				// do not block if the child is still running
+				waitpid(cpid1, NULL, WNOHANG);
+			}
+			else {
+				// wait here until the child finishes
+				waitpid(cpid1, NULL, 0);
+				printf("done waiting for child\n");
+				
+			}
+
+		}
+		else { // fork failed
+			perror("FORK:  n");//prints "FORK: " followed by an error message
+			exit(1);
+		}
+
+
+	}
+
 }
