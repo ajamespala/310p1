@@ -63,7 +63,7 @@ int main(){
 			exit(0);
 		}
 
-		fprintf(stdout, "DEBUG: %s\n", cmdline);
+		//fprintf(stdout, "DEBUG: %s\n", cmdline);
 
 		// TODO: complete the following top-level steps
 		// (2) parse the cmdline
@@ -99,7 +99,7 @@ int main(){
 int parseCommandLine(char **argv, char *cmd_path) {
 	char cmd[MAXLINE];
 	char *path = getenv("PATH");
-	printf("Possible paths: %s\n", path);
+	//printf("Possible paths: %s\n", path);
 	char exec_name[MAXLINE] = "";
 	strcpy(exec_name, argv[0]);
 	char temp[MAXLINE];
@@ -115,7 +115,7 @@ int parseCommandLine(char **argv, char *cmd_path) {
 		access_flag = access(cmd, X_OK);
 		fflush(stdout);
 		if(access_flag == 0) {
-			printf("Break\n"); 
+			//printf("Break\n"); 
 			break;
 		}
 		token = strtok(NULL, ":");
@@ -123,7 +123,7 @@ int parseCommandLine(char **argv, char *cmd_path) {
 	}
 	if(access_flag == -1) {
 		//command doesn't exist
-		printf("DEBUG: access flag is -1\n");
+		//printf("DEBUG: access flag is -1\n");
 		return 0;
 	}
 	argv[0] = strdup(cmd);
@@ -150,18 +150,18 @@ int handleCommand(char **args, int bg){
                 if (getcwd(cwd, sizeof(cwd)) == NULL) {
                         perror("getcwd() error");
                 }
-                else {
-                        printf("current working directory is: %s\n", cwd);
-                }
+//                else {
+//                       printf("current working directory is: %s\n", cwd);
+//                }
 
                 int ch_dir = chdir(args[1]);
                 if (ch_dir == -1){
                         fprintf(stderr, "ERROR: directory not found\n");
                 }
-		else {
-			getcwd(cwd, sizeof(cwd));
-			printf("new directory is: %s\n", cwd);
-		}
+//		else {
+//			getcwd(cwd, sizeof(cwd));
+//			printf("new directory is: %s\n", cwd);
+//		}
 		return 1;
         }
 
@@ -231,8 +231,6 @@ void runExternalCommand(char **args, int bg){
 	pid_t cpid1, cpid2;
 	if(pipe_cmd ==1){
 		
-		printf("in the pipe_cmd = 1\n");
-
 		memcpy(args2, args + index + 1, 20 *sizeof(*args));
 		args[index] = NULL;
 
@@ -241,12 +239,12 @@ void runExternalCommand(char **args, int bg){
 			printf("Pipe failed\n");
 			return;
 		}
-
+		/*
 		if (pipe(pipe_id)){
 			fprintf(stderr, "Pipe failed.\n");
 			exit(1);
 		}
-
+		*/
 		cpid1 = fork();
 		if (cpid1 == 0) { // child prcoess
 			
@@ -254,10 +252,10 @@ void runExternalCommand(char **args, int bg){
 			dup2(pipe_id[1], STDOUT_FILENO);
 			close(pipe_id[1]);
 			
-			printf("COMAND PATH FOR EXECV: %s\n", args[0]);
+			//printf("COMAND PATH FOR EXECV: %s\n", args[0]);
 			execv(args[0], args);
 
-			fprintf(stderr, "ERROR: Command not found\n");
+			//fprintf(stderr, "ERROR: Command not found\n");
 			exit(63);
 		}
 		else { // parent process 
@@ -272,8 +270,9 @@ void runExternalCommand(char **args, int bg){
 			} 
 			else {
 				//wait here until the children finish
-				printf("about to wait for the children to finish\n");
-				wait(NULL);
+				//printf("about to wait for the children to finish\n");
+				waitpid(cpid2, NULL, 0);
+				waitpid(cpid1, NULL, 0);
 			}
 			
 		}
@@ -285,11 +284,11 @@ void runExternalCommand(char **args, int bg){
 		if (cpid1 == 0){ // child process
 			char full_cmd[MAXLINE] = "";
 			strcat(full_cmd, args[0]);
-			printf("full_cmd: %s\n", full_cmd);	
+			//printf("full_cmd: %s\n", full_cmd);	
 			execv(full_cmd, args);
 
 			//prints if execv fails
-			fprintf(stderr, "ERROR: Commnand not found.\n");
+			//fprintf(stderr, "ERROR: Commnand not found.\n");
 			exit(63);
 		}
 		else if (cpid1 > 0){// parent process and background process
@@ -302,7 +301,7 @@ void runExternalCommand(char **args, int bg){
 			else {
 				// wait here until the child finishes
 				waitpid(cpid1, NULL, 0);
-				printf("done waiting for child\n");
+				//printf("done waiting for child\n");
 				
 			}
 
@@ -316,26 +315,4 @@ void runExternalCommand(char **args, int bg){
 	}
 
 }
-/*=======
-	pid_t cpid = fork();
-	if (cpid == 0) { // child prcoess
-		//execv(full_path_to_command_executable, command_argv_list);
-		// need to make sure that the full path is held in args[0]
-		char full_cmd[MAXLINE] = "";
-		strcat(full_cmd, args[0]);
-		printf("full_cmd: %s\n", full_cmd);
-
-		execv(full_cmd, args);
-		
-		
-		// if execv fails, pritn out the error statement, otherwise we should not get here
-		fprintf(stderr, "**ERROR: Command not found\n");
-		exit(63);
-	}
-	else if (cpid > 0) { // parent process and background process
-		if (bg){	
-			// check to see if the child has returned
-			// do not block if the child is still running
-			waitpid(cpid, NULL, WNOHANG);
->>>>>>> 4c73585997aa05b95c3752190949713f439979a2
-*/	
+	
