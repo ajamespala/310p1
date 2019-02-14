@@ -96,35 +96,37 @@ int main(){
 }
 
 int parseCommandLine(char **argv, char *cmd_path) {
+	char cmd[MAXLINE];
 	char *path = getenv("PATH");
 	printf("Possible paths: %s\n", path);
 	char exec_name[MAXLINE] = "";
 	strcpy(exec_name, argv[0]);
-	
-	char *token = strtok(path, ":");
+	char temp[MAXLINE];
+	strcpy(temp, path);	
+	char *token = strtok(temp, ":");
 	int access_flag = -1;
 	while(token != NULL) {
 		//concatinate token and cmd here
-		strcpy(cmd_path, token);
-		strcat(cmd_path, "/");
-		strcat(cmd_path, exec_name);
-		printf("%s\n", cmd_path);
-		access_flag = access(cmd_path, X_OK);
+		strcpy(cmd, token);
+		strcat(cmd, "/");
+		strcat(cmd, exec_name);
+		//printf("Test cmd: %s\n", cmd);
+		access_flag = access(cmd, X_OK);
 		fflush(stdout);
-		if(access_flag == 0) { 
+		if(access_flag == 0) {
+			printf("Break\n"); 
 			break;
 		}
 		token = strtok(NULL, ":");
-		printf("DEBUG: Checkpoint\n");
 		fflush(stdout);
-		printf("Next token: %s\n", cmd_path);
 	}
-	printf("DEBUG: access flag is -1\n");
 	if(access_flag == -1) {
 		//command doesn't exist
+		printf("DEBUG: access flag is -1\n");
 		return 0;
 	}
-	strcpy(argv[0], cmd_path);
+	argv[0] = strdup(cmd);
+//	strncpy(argv[0], cmd, (MAXLINE-1));
 	return 1;
 }
 
@@ -213,13 +215,17 @@ int handleCommand(char **args, int bg){
 void runExternalCommand(char **args, int bg){
 	pid_t cpid = fork();
 	if (cpid == 0) { // child prcoess
-		execv(args[0], args);
 		//execv(full_path_to_command_executable, command_argv_list);
 		// need to make sure that the full path is held in args[0]
+		char full_cmd[MAXLINE] = "";
+		strcat(full_cmd, args[0]);
+		printf("full_cmd: %s\n", full_cmd);
+
+		execv(full_cmd, args);
 		
 		
 		// if execv fails, pritn out the error statement, otherwise we should not get here
-		fprintf(stderr, "ERROR: Command not found\n");
+		fprintf(stderr, "**ERROR: Command not found\n");
 		exit(63);
 	}
 	else if (cpid > 0) { // parent process and background process
