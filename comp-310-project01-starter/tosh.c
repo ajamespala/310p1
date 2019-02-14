@@ -226,11 +226,15 @@ void runExternalCommand(char **args, int bg){
 		i++;
 	}	
 	
+	char *args2[MAXARGS];	
 
 	pid_t cpid1, cpid2;
 	if(pipe_cmd ==1){
 		
 		printf("in the pipe_cmd = 1\n");
+
+		memcpy(args2, args + index + 1, 20 *sizeof(*args));
+		args[index] = NULL;
 
 		int pipe_id[2];
 		if(pipe(pipe_id) != 0){
@@ -262,7 +266,7 @@ void runExternalCommand(char **args, int bg){
 				close(pipe_id[1]);
 				dup2(pipe_id[0], STDIN_FILENO);
 				close(pipe_id[0]);
-				execv(args[0], args);
+				execv(args2[0], args2);
 				// prints if execv fails
 				fprintf(stderr, "ERROR: Command not found.\n");
 			} 
