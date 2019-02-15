@@ -1,0 +1,8 @@
+ls
+cat test.txt
+history
+sort test.txt | uniq
+
+cd ..
+pwd
+exit
