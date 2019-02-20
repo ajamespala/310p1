@@ -253,6 +253,8 @@ void runExternalCommand(char **args, int bg){
 			close(pipe_id[1]);
 			
 			//printf("COMAND PATH FOR EXECV: %s\n", args[0]);
+			fprintf(stderr,"child executes!");
+			fflush(stdout);
 			execv(args[0], args);
 
 			//fprintf(stderr, "ERROR: Command not found\n");
@@ -264,9 +266,11 @@ void runExternalCommand(char **args, int bg){
 				close(pipe_id[1]);
 				dup2(pipe_id[0], STDIN_FILENO);
 				close(pipe_id[0]);
+				printf("parent with child executes!\n");
 				execv(args2[0], args2);
+				printf("_______________\n");
 				// prints if execv fails
-				fprintf(stderr, "ERROR: Command not found.\n");
+				fprintf(stdout, "ERROR: Command not found.\n");
 			} 
 			else {
 				//wait here until the children finish
