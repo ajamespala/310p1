@@ -324,12 +324,14 @@ void runExternalCommand(char **args, int bg){
 				close(fid);
 				args[i] = NULL;
 			}
-		
+			/*
 			//commented out following code for clarity
 			char full_cmd[MAXLINE] = "";
 			strcat(full_cmd, args[0]);
 			printf("full_cmd: %s\n", full_cmd);	
 			execv(full_cmd, args);
+			*/
+			execv(args[0], args);
 
 			//prints if execv fails
 			//fprintf(stderr, "ERROR: Commnand not found.\n");
