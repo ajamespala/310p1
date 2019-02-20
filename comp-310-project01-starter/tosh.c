@@ -15,6 +15,7 @@
 
 #include "parse_args.h"
 #include "history_queue.h"
+#include <fcntl.h>
 
 // TODO: add your function prototypes here as necessary
 static int handleCommand(char **args, int bg);
@@ -218,9 +219,9 @@ void runExternalCommand(char **args, int bg){
 	int i = 0;
 	int index = 0;
 	int pipe_cmd = 0;
-	int stdin = 0;
-	int stdout = 0;
-	int stderr = 0;
+	int si = 0;
+	int so = 0;
+	int se = 0;
 	while(args[i] != NULL){
 		if(strcmp(args[i], "|") == 0){
 			index = i;
@@ -228,15 +229,15 @@ void runExternalCommand(char **args, int bg){
 		}
 		if(strcmp(args[i], "<") == 0){
 			index = i;
-			stdin = 1;
+			si = 1;
 		}
 		if(strcmp(args[i], "1>") == 0){
 			index = i;
-			stdout = 1;
+			so = 1;
 		}
 		if(strcmp(args[i], "2>") == 0){
 			index = i;
-			stderr = 1;
+			se = 1;
 		}
 		i++;
 	}	
@@ -305,19 +306,19 @@ void runExternalCommand(char **args, int bg){
 		if (cpid1 == 0){ // child process
 			//new code for IO Redirection
 
-			if(stdin == 1){
+			if(si == 1){
 				int fid = open(args[i + 1], O_RDONLY, 0666);
 				dup2(fid, 0);
 				close(fid);	
 				args[i] = NULL;
 			}	
-			if(stdout == 1){
+			if(so == 1){
 				int fid = open(args[i + 1], O_WRONLY | O_CREAT, 0666);
 				dup2(fid, 1);
 				close(fid);
 				args[i] = NULL;
 			}
-			if(stderr == 1){
+			if(se == 1){
 				int fid = open(args[i + 1], O_APPEND | O_WRONLY | O_CREAT, 0666);
 				dup2(fid, 2);
 				close(fid);
@@ -325,9 +326,9 @@ void runExternalCommand(char **args, int bg){
 			}
 		
 			//commented out following code for clarity
-			//char full_cmd[MAXLINE] = "";
-			//strcat(full_cmd, args[0]);
-			//printf("full_cmd: %s\n", full_cmd);	
+			char full_cmd[MAXLINE] = "";
+			strcat(full_cmd, args[0]);
+			printf("full_cmd: %s\n", full_cmd);	
 			execv(full_cmd, args);
 
 			//prints if execv fails
