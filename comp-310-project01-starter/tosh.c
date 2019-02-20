@@ -218,15 +218,27 @@ void runExternalCommand(char **args, int bg){
 	int i = 0;
 	int index = 0;
 	int pipe_cmd = 0;
+	int redirect_cmd = 0;
 	while(args[i] != NULL){
 		if(strcmp(args[i], "|") == 0){
 			index = i;
 			pipe_cmd = 1;
 		}
+		if(strcmp(args[i], "<") == 0){
+			redirect_cmd = 1;
+		}
+		if(strcmp(args[i], "1>") == 0){
+			redirect_cmd = 1;
+		}
+		if(strcmp(args[i], "2>") == 0){
+			redirect_cmd = 1;
+		}
 		i++;
 	}	
 	
 	char *args2[MAXARGS];	
+
+	// TODO: add statement to handle to I/O redirect_cmd
 
 	pid_t cpid1, cpid2;
 	if(pipe_cmd ==1){
