@@ -5,4 +5,8 @@ sort test.txt | uniq
 
 cd ..
 pwd
+ls -l 1> temp.txt
+cat temp.txt
+history
+!5
 exit

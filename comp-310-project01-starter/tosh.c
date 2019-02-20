@@ -220,23 +220,26 @@ void runExternalCommand(char **args, int bg){
 	int index = 0;
 	int pipe_cmd = 0;
 	int si = 0;
+	int siIndex = 0;
 	int so = 0;
+	int soIndex = 0;
 	int se = 0;
+	int seIndex = 0;
 	while(args[i] != NULL){
 		if(strcmp(args[i], "|") == 0){
 			index = i;
 			pipe_cmd = 1;
 		}
 		if(strcmp(args[i], "<") == 0){
-			index = i;
+			siIndex = i;
 			si = 1;
 		}
 		if(strcmp(args[i], "1>") == 0){
-			index = i;
+			soIndex = i;
 			so = 1;
 		}
 		if(strcmp(args[i], "2>") == 0){
-			index = i;
+			seIndex = i;
 			se = 1;
 		}
 		i++;
@@ -271,8 +274,8 @@ void runExternalCommand(char **args, int bg){
 			close(pipe_id[1]);
 			
 			//printf("COMAND PATH FOR EXECV: %s\n", args[0]);
-			fprintf(stderr,"child executes!");
-			fflush(stdout);
+			//fprintf(stderr,"child executes!");
+			//fflush(stdout);
 			execv(args[0], args);
 
 			//fprintf(stderr, "ERROR: Command not found\n");
@@ -284,11 +287,11 @@ void runExternalCommand(char **args, int bg){
 				close(pipe_id[1]);
 				dup2(pipe_id[0], STDIN_FILENO);
 				close(pipe_id[0]);
-				printf("parent with child executes!\n");
+				//printf("parent with child executes!\n");
 				execv(args2[0], args2);
-				printf("_______________\n");
+				//printf("_______________\n");
 				// prints if execv fails
-				fprintf(stdout, "ERROR: Command not found.\n");
+				//fprintf(stdout, "ERROR: Command not found.\n");
 			} 
 			else {
 				//wait here until the children finish
@@ -305,34 +308,32 @@ void runExternalCommand(char **args, int bg){
 		cpid1 = fork();
 		if (cpid1 == 0){ // child process
 			//new code for IO Redirection
+			
 
 			if(si == 1){
-				int fid = open(args[i + 1], O_RDONLY, 0666);
+				int fid = open(args[siIndex + 1], O_RDONLY, 0666);
 				dup2(fid, 0);
 				close(fid);	
-				args[i] = NULL;
+				args[siIndex] = NULL;
 			}	
 			if(so == 1){
-				int fid = open(args[i + 1], O_WRONLY | O_CREAT, 0666);
+				int fid = open(args[soIndex + 1], O_WRONLY | O_CREAT, 0666);
 				dup2(fid, 1);
 				close(fid);
-				args[i] = NULL;
+				args[soIndex] = NULL;
 			}
 			if(se == 1){
-				int fid = open(args[i + 1], O_APPEND | O_WRONLY | O_CREAT, 0666);
+				int fid = open(args[seIndex + 1], O_APPEND | O_WRONLY | O_CREAT, 0666);
 				dup2(fid, 2);
 				close(fid);
-				args[i] = NULL;
+				args[seIndex] = NULL;
 			}
-			/*
+			
 			//commented out following code for clarity
 			char full_cmd[MAXLINE] = "";
 			strcat(full_cmd, args[0]);
-			printf("full_cmd: %s\n", full_cmd);	
+			//printf("full_cmd: %s\n", full_cmd);	
 			execv(full_cmd, args);
-			*/
-			execv(args[0], args);
-
 			//prints if execv fails
 			//fprintf(stderr, "ERROR: Commnand not found.\n");
 			exit(63);
