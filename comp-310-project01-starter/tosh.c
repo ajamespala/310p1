@@ -85,7 +85,7 @@ int main(){
 		char cmd_path[MAXLINE];
 		int cmd_exists = parseCommandLine(argv, cmd_path);
 		
-		if(cmd_exists == 0) {
+		if(cmd_exists == 0 && strcmp(argv[0], "siesta") != 0) {
 			printf("%s does not exist\n", argv[0]);
 			continue;
 		}
@@ -195,8 +195,7 @@ int handleCommand(char **args, int bg){
 			}		
 			char cmd_path[MAXLINE];
 			int cmd_exists = parseCommandLine(argv, cmd_path);
-			
-			if(cmd_exists == 0) {
+			if(cmd_exists == 0 && strcmp(argv[0],"siesta") != 0) {
 				printf("%s does not exist\n", argv[0]);
 				return 0;
 			}
