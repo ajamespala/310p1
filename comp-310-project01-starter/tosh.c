@@ -97,6 +97,17 @@ int main(){
 	return 0;
 }
 
+/*
+This function parses the command line. It tokenizes the 
+command so that we can get the path to execute the process. We 
+both put equal time into this function.
+
+@param argv = the full the command read in from the shell
+@param cmd_path = the cmd_path array to be used to find the commands path
+
+returns 1 on success
+returns 0 on failure
+*/
 int parseCommandLine(char **argv, char *cmd_path) {
 	char cmd[MAXLINE];
 	char *path = getenv("PATH");
@@ -131,6 +142,19 @@ int parseCommandLine(char **argv, char *cmd_path) {
 //	strncpy(argv[0], cmd, (MAXLINE-1));
 	return 1;
 }
+
+/*
+This function works to handle the built in commands of the shell. It 
+is able to implement all the basic commands and then calls
+runExternalCommand if it is not able to do so. We both put equal time
+into this function.
+
+@param args = the command that is read in by the shell
+@param bg = boolean value to indicate whether or not the process should run in the background
+
+returns 1 on success of a built in command
+returns 0 if it makes a call to runExternalCommand
+*/
 
 int handleCommand(char **args, int bg){
 	 // handle the built in commands directly
@@ -214,6 +238,19 @@ int handleCommand(char **args, int bg){
 
 }
 
+/*
+this function works to run the external commands that are not handled in 
+handleCommand. It hanldes the pipe and IO redirection. We both put equal time
+into this function.
+
+@param args = the command that is read in from the shell
+@param bg = boolean value to indicate whether or not the process should run in the background
+
+variables - pipe_cmd, si, so, se indicate which process to run
+variables - index, siIndex, soIndex, seIndex used to parse the command and keep track of the second command
+*/
+
+
 void runExternalCommand(char **args, int bg){
 	int i = 0;
 	int index = 0;
@@ -270,15 +307,6 @@ void runExternalCommand(char **args, int bg){
 			j++;
 		} 
 		cmd2[j] = NULL;	
-
-
-
-
-
-
-
-
-
 
 		int pipe_id[2];
 		if(pipe(pipe_id) != 0){
