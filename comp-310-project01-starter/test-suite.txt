@@ -1,7 +1,7 @@
 ls
 cat test.txt
 history
-sort test.txt | uniq
+cat test.txt | grep foo
 
 cd ..
 pwd

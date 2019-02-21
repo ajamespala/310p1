@@ -292,7 +292,6 @@ void runExternalCommand(char **args, int bg){
 		}
 		*/
 		cpid1 = fork();
-		cpid2 = fork();
 		if (cpid1 == 0) { // child prcoess
 			
 			close(pipe_id[0]);
@@ -305,7 +304,8 @@ void runExternalCommand(char **args, int bg){
 			//fprintf(stderr, "ERROR: Command not found\n");
 			exit(0);
 		}
-		else if(cpid2 == 0){		
+		cpid2 = fork();
+		if(cpid2 == 0){		
 				close(pipe_id[1]);
 				dup2(pipe_id[0], STDIN_FILENO);
 				close(pipe_id[0]);
@@ -322,8 +322,8 @@ void runExternalCommand(char **args, int bg){
 		else {
 			close(pipe_id[0]);
 			close(pipe_id[1]);		
-			waitpid(cpid1, NULL, 0);
 			waitpid(cpid2, NULL, 0);
+			waitpid(cpid1, NULL, 0);
 			
 		}
 	}
