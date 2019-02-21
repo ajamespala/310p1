@@ -215,7 +215,6 @@ int handleCommand(char **args, int bg){
 }
 
 void runExternalCommand(char **args, int bg){
-
 	int i = 0;
 	int index = 0;
 	int pipe_cmd = 0;
@@ -251,9 +250,35 @@ void runExternalCommand(char **args, int bg){
 
 	pid_t cpid1, cpid2;
 	if(pipe_cmd ==1){
-		
 		memcpy(args2, args + index + 1, 20 *sizeof(*args));
 		args[index] = NULL;
+
+		char *cmd1[MAXARGS];
+		char *cmd2[MAXARGS];
+		int i;
+		int j = 0;
+		int k = index + 1;
+		
+		for(i = 0; i < index; i++) {
+			cmd1[i] = args[i];
+		}
+		cmd1[i] = NULL;
+
+		while (args[k] != NULL) {
+			cmd2[j] = args[k];
+			k++;
+			j++;
+		} 
+		cmd2[j] = NULL;	
+
+
+
+
+
+
+
+
+
 
 		int pipe_id[2];
 		if(pipe(pipe_id) != 0){
@@ -267,6 +292,7 @@ void runExternalCommand(char **args, int bg){
 		}
 		*/
 		cpid1 = fork();
+		cpid2 = fork();
 		if (cpid1 == 0) { // child prcoess
 			
 			close(pipe_id[0]);
@@ -274,16 +300,12 @@ void runExternalCommand(char **args, int bg){
 			close(pipe_id[1]);
 			
 			//printf("COMAND PATH FOR EXECV: %s\n", args[0]);
-			//fprintf(stderr,"child executes!");
-			//fflush(stdout);
 			execv(args[0], args);
 
 			//fprintf(stderr, "ERROR: Command not found\n");
-			exit(63);
+			exit(0);
 		}
-		else { // parent process 
-			cpid2 = fork();
-			if(cpid2 == 0){		
+		else if(cpid2 == 0){		
 				close(pipe_id[1]);
 				dup2(pipe_id[0], STDIN_FILENO);
 				close(pipe_id[0]);
@@ -292,13 +314,16 @@ void runExternalCommand(char **args, int bg){
 				//printf("_______________\n");
 				// prints if execv fails
 				//fprintf(stdout, "ERROR: Command not found.\n");
-			} 
-			else {
+	
 				//wait here until the children finish
 				//printf("about to wait for the children to finish\n");
-				waitpid(cpid2, NULL, 0);
-				waitpid(cpid1, NULL, 0);
-			}
+				exit(0);
+		}
+		else {
+			close(pipe_id[0]);
+			close(pipe_id[1]);		
+			waitpid(cpid1, NULL, 0);
+			waitpid(cpid2, NULL, 0);
 			
 		}
 	}
